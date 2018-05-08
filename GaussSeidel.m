@@ -1,4 +1,4 @@
-function u = GaussSeidel(A,b,tol,it)
+function [u,err] = GaussSeidel(A,b,tol,it)
 %A is the coefficient matrix for u
 %b is the rhs vector
 %tol is the tolerance, we will use 1e-6
@@ -7,6 +7,7 @@ function u = GaussSeidel(A,b,tol,it)
 [m,n] = size(A);
 if m~=n, error('Matrix A must be square');end
    C = A;
+   u = zeros();
 for i = 1:n
     C(i,i) = 0;
     u(i) = 0;
@@ -15,6 +16,7 @@ u = u';
 for i = 1:n
     C(i,1:n) = C(i,1:n)/A(i,i);
 end
+d = zeros();
 for i = 1:n
     d(i) = b(i)/A(i,i);
 end
@@ -23,6 +25,7 @@ while (1)
     uold = u;
     for i = 1:n
         u(i) = d(i)-C(i,:)*u;
+        err = zeros();
         if u(i) ~= 0 
             err(i) = abs((u(i) - uold(i))/u(i)) * 100; %Calculates Normalized Error
         end

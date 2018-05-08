@@ -20,4 +20,3 @@ nb = n + 1;
    for i = n-1:-1:1
        x(i) = (Aug(i,nb) - Aug(i,i+1:n)*x(i+1:n))/Aug(i,i);
    end
-   x(i);

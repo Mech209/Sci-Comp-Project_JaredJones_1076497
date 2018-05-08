@@ -7,9 +7,9 @@ by = pi();
 tol = 1e-6; %degree of tolerance
 it = 50; %Max Number of Iterations to complete
 %Delta
-N = 50;
+N = 3;
 h = (bx-ax)/(N+1);
-lambda = 1;
+lambda = 0;
 x = ax:h:bx;
 x = x';
 y = ay:h:by;
@@ -60,7 +60,7 @@ for kk = 1:N-1
     K(1+(kk-1)*(N+1):(N+1)+(kk-1)*(N+1),kk*(N+1)+1:kk*(N+1)+(N+1))=K_sup;
 end
 
-A = GaussSeidel(K,F,tol,it);
+[A,err] = GaussSeidel(K,F,tol,it);
 
 %Gaussian Elimination b
 %B = Gaussian_E(K,F);
