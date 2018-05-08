@@ -4,12 +4,11 @@ ax = -pi();
 ay = -pi();
 bx = pi();
 by = pi();
-tol = 1e-6; %degree of tolerance
-it = 100; %Max Number of Iterations to complete
+
 %Delta
-N = 100;
+N = 30;
 h = (bx-ax)/(N+1);
-lambda = 0;
+lambda = 1;
 x = ax:h:bx;
 x = x';
 y = ay:h:by;
@@ -55,9 +54,27 @@ end
 for kk = 1:N-1
     K(1+(kk-1)*(N+1):(N+1)+(kk-1)*(N+1),kk*(N+1)+1:kk*(N+1)+(N+1))=K_sup;
 end
-%Gauss Seidel 
-[A,err] = GaussSeidel(K,F,tol,it);
-A = reshape(A,N+1,N);
-u(2:N+2,2:N+1) = A;
+
+%Begin Gaussian Elimination sequence
+%K is coefficient Matrix
+%F is RHS vector
+[m,n] = size(K);
+nb = n + 1;
+   Aug = [K, F];
+   %Forward Elimination
+   for k = 1:n-1
+       for i = k+1:n
+           factor = Aug(i,k)/Aug(k,k);
+           Aug(i,k:nb) = Aug(i,k:nb) - factor*Aug(k,k:nb);
+       end
+   end
+   %Back Substitution 
+   w = zeros(n,1);
+   w(n) = Aug(n,nb)/Aug(n,n);
+   for i = n-1:-1:1
+       w(i) = (Aug(i,nb) - Aug(i,i+1:n)*w(i+1:n))/Aug(i,i);
+   end
+w = reshape(w,N+1,N);
+u(2:N+2,2:N+1) = w;
 
 surf(y,x,u)

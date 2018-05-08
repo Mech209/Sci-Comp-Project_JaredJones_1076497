@@ -7,9 +7,9 @@ by = pi();
 tol = 1e-6; %degree of tolerance
 it = 100; %Max Number of Iterations to complete
 %Delta
-N = 100;
+N = 50;
 h = (bx-ax)/(N+1);
-lambda = 0;
+lambda = 1;
 x = ax:h:bx;
 x = x';
 y = ay:h:by;
@@ -38,6 +38,10 @@ F(1,:) = F(1,:) - u(1,2:N+1);
 F(:,N) = F(:,N) - u(2:N+2,N+2);
 F = reshape(F,(N+1)*N,1);
 
+%Uknown U Matrix
+U = u(2:N+2,2:N+1);
+U = reshape(U,(N+1)*N,1);
+
 %creating coefficient matrix
 K_sup = eye(N+1);
 K_Main = D*eye(N+1) + diag(ones(N,1),1) + diag(ones(N,1),-1); 
@@ -55,9 +59,43 @@ end
 for kk = 1:N-1
     K(1+(kk-1)*(N+1):(N+1)+(kk-1)*(N+1),kk*(N+1)+1:kk*(N+1)+(N+1))=K_sup;
 end
-%Gauss Seidel 
-[A,err] = GaussSeidel(K,F,tol,it);
-A = reshape(A,N+1,N);
-u(2:N+2,2:N+1) = A;
+%K is the coefficient matrix for u
+%F is the rhs vector
+%tol is the tolerance, we will use 1e-6
+%it is the iteration prescribed by the user, we will try up to 50 iterations
+%u is the solution vector
+[m,n] = size(A);
+if m~=n, error('Matrix A must be square');end
+   C = A;
+   c = zeros();
+for i = 1:n
+    C(i,i) = 0;
+    c(i) = 0;
+end
+c = c';
+for i = 1:n
+    C(i,1:n) = C(i,1:n)/A(i,i);
+end
+d = zeros();
+for i = 1:n
+    d(i) = b(i)/A(i,i);
+end
+iter = 0;
+while (1)
+    uold = u;
+    for i = 1:n
+        u(i) = d(i)-C(i,:)*u;
+        if u(i) ~= 0 
+            err(i) = abs((u(i) - uold(i))/u(i)) * 100; %Calculates Normalized Error
+        end
+    end
+    iter = iter + 1;
+    if max(err)<= tol || iter >= it, break, end  %checks error against tolerance, or if max 'iter' is reached
+end
+for i = 1:length(u)
+    %fprintf('\nu%d = %f\n',i,u(i));
+end
 
-surf(y,x,u)
+u = reshape(A,N+1,N);
+u(2:N+2,2:N+1) = A;
+    

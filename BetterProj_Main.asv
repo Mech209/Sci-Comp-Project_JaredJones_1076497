@@ -5,11 +5,11 @@ ay = -pi();
 bx = pi();
 by = pi();
 tol = 1e-6; %degree of tolerance
-it = 100; %Max Number of Iterations to complete
+it = 1000; %Max Number of Iterations to complete
 %Delta
-N = 100;
+N = 50;
 h = (bx-ax)/(N+1);
-lambda = 0;
+lambda = 1;
 x = ax:h:bx;
 x = x';
 y = ay:h:by;
@@ -38,6 +38,10 @@ F(1,:) = F(1,:) - u(1,2:N+1);
 F(:,N) = F(:,N) - u(2:N+2,N+2);
 F = reshape(F,(N+1)*N,1);
 
+%Uknown U Matrix
+U = u(2:N+2,2:N+1);
+U = reshape(U,(N+1)*N,1);
+
 %creating coefficient matrix
 K_sup = eye(N+1);
 K_Main = D*eye(N+1) + diag(ones(N,1),1) + diag(ones(N,1),-1); 
@@ -55,9 +59,9 @@ end
 for kk = 1:N-1
     K(1+(kk-1)*(N+1):(N+1)+(kk-1)*(N+1),kk*(N+1)+1:kk*(N+1)+(N+1))=K_sup;
 end
-%Gauss Seidel 
-[A,err] = GaussSeidel(K,F,tol,it);
-A = reshape(A,N+1,N);
-u(2:N+2,2:N+1) = A;
 
-surf(y,x,u)
+%[A,err] = GaussSeidel(K,F,tol,it);
+
+%Gaussian Elimination b
+%B = Gaussian_E(K,F);
+

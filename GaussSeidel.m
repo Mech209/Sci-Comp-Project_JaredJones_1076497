@@ -8,6 +8,20 @@ function [u,err] = GaussSeidel(A,b,tol,it)
 if m~=n, error('Matrix A must be square');end
    C = A;
    u = zeros();
+   if prod(diag(A))==0
+disp('gauss-seidel iterative method is not applicable');
+return
+   end
+   %Convergence Check
+E=tril(A,-1);
+F=triu(A,1);
+D=A-E-F;
+Bj=-inv(D)*(E+F);
+rho=max(abs(eig(Bj))); %spectral radius
+if rho>=1
+disp('gauss-seidel method do not converge');
+return
+end
 for i = 1:n
     C(i,i) = 0;
     u(i) = 0;
@@ -25,16 +39,12 @@ while (1)
     uold = u;
     for i = 1:n
         u(i) = d(i)-C(i,:)*u;
-        err = zeros();
         if u(i) ~= 0 
             err(i) = abs((u(i) - uold(i))/u(i)) * 100; %Calculates Normalized Error
         end
     end
     iter = iter + 1;
     if max(err)<= tol || iter >= it, break, end  %checks error against tolerance, or if max 'iter' is reached
-end
-for i = 1:length(u)
-    fprintf('\nu%d = %f\n',i,u(i));
 end
 end
     
